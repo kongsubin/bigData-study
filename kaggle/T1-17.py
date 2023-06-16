@@ -1,3 +1,4 @@
+# T1-17. Time-Series1 / #시계열데이터 #datetime 
 # 2022년 5월 sales의 중앙값을 구하시오
 # 데이터셋 : basic2.csv
 
