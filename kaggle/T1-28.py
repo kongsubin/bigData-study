@@ -7,4 +7,5 @@ print(data.head())
 data_new = data[data['hour'] < 13]
 print(data_new.head())
 
+print(data_new['date'].value_counts())
 print(data_new['date'].value_counts().index[0])

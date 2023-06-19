@@ -50,10 +50,10 @@ print(data3.iloc[0,0], data3.iloc[0,1])
 from scipy.stats import mode
 
 # data2의 최빈값과 개수 구하기
-print(mode(data2))
-# 최빈값만
-print(mode(data2)[0])
-# 개수만 
-print(mode(data2)[1])
-# 정수형 변환
-print(int(mode(data2)[0]), int(mode(data2)[1]))
+# print(mode(data2))
+# # 최빈값만
+# print(mode(data2)[0])
+# # 개수만 
+# print(mode(data2)[1])
+# # 정수형 변환
+# print(int(mode(data2)[0]), int(mode(data2)[1]))
