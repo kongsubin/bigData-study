@@ -64,15 +64,15 @@ print(y_train.head())
 # 3. 기초통계량 확인하기 
 print(x_train.describe())
 
-# object 컬럼 확인 
+# 4. object 컬럼 확인 
 print(x_train['workclass'].unique())
+print(x_train['occupation'].unique())
+print(x_train['native.country'].unique())
 print(x_train['education'].unique())
 print(x_train['marital.status'].unique())
-print(x_train['occupation'].unique())
 print(x_train['relationship'].unique())
 print(x_train['race'].unique())
 print(x_train['sex'].unique())
-print(x_train['native.country'].unique())
 
 
 ####### 데이터 전처리
@@ -83,4 +83,90 @@ x_test = x_test.drop(columns='id')
 y_train = y_train.drop(columns='id')
 
 # 2. 결측치 확인
-print(x_train.isnull().sum()
+# 결측치는 최빈값과 차이가 크면 최빈값으로, 값이 비슷하면 별도의 값으로 대체함
+print(x_train.isnull().sum())
+print(x_train['workclass'].value_counts())
+print(x_train['occupation'].value_counts())
+print(x_train['native.country'].value_counts())
+x_train['workclass'] = x_train['workclass'].fillna(x_train['workclass'].mode()[0])
+x_train['occupation'] = x_train['occupation'].fillna("nan")
+x_train['native.country'] = x_train['native.country'].fillna(x_train['native.country'].mode()[0])
+print(x_train.isnull().sum())
+
+print(x_test.isnull().sum())
+print(x_test['workclass'].value_counts())
+print(x_test['occupation'].value_counts())
+print(x_test['native.country'].value_counts())
+x_test['workclass'] = x_test['workclass'].fillna(x_test['workclass'].mode()[0])
+x_test['occupation'] = x_test['occupation'].fillna("nan")
+x_test['native.country'] = x_test['native.country'].fillna(x_test['native.country'].mode()[0])
+print(x_test.isnull().sum())
+
+# 3. 라벨 인코딩
+from sklearn.preprocessing import LabelEncoder
+encoder = LabelEncoder()
+x_train['workclass'] = encoder.fit_transform(x_train['workclass']) 
+x_train['occupation'] = encoder.fit_transform(x_train['occupation']) 
+x_train['native.country'] = encoder.fit_transform(x_train['native.country']) 
+x_train['education'] = encoder.fit_transform(x_train['education']) 
+x_train['marital.status'] = encoder.fit_transform(x_train['marital.status']) 
+x_train['relationship'] = encoder.fit_transform(x_train['relationship']) 
+x_train['race'] = encoder.fit_transform(x_train['race']) 
+x_train['sex'] = x_train['sex'].replace('Male', 0).replace('Female', 1)
+
+x_test['workclass'] = encoder.fit_transform(x_test['workclass']) 
+x_test['occupation'] = encoder.fit_transform(x_test['occupation']) 
+x_test['native.country'] = encoder.fit_transform(x_test['native.country']) 
+x_test['education'] = encoder.fit_transform(x_test['education']) 
+x_test['marital.status'] = encoder.fit_transform(x_test['marital.status']) 
+x_test['relationship'] = encoder.fit_transform(x_test['relationship']) 
+x_test['race'] = encoder.fit_transform(x_test['race']) 
+x_test['sex'] = x_test['sex'].replace('Male', 0).replace('Female', 1)
+
+# 4. 스케일링
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+x_train = pd.DataFrame(scaler.fit_transform(x_train), columns=x_train.columns)
+print(x_train.head())
+x_test = pd.DataFrame(scaler.fit_transform(x_test), columns=x_test.columns)
+print(x_test.head())
+
+# 5. y값 바꾸기
+condition = y_train['income'] == ">50K"
+y_train.loc[condition, 'income'] = 1
+y_train.loc[~condition, 'income'] = 0
+y_train['income'] = y_train['income'].astype('int64')
+
+print(x_train.info())
+print(y_train)
+ 
+ 
+####### 학습 및 평가
+from sklearn.model_selection import train_test_split
+X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = train_test_split(x_train, y_train, test_size=0.2)
+
+# from sklearn.ensemble import RandomForestClassifier
+# model = RandomForestClassifier()
+# model.fit(X_TRAIN, Y_TRAIN)
+# from sklearn.metrics import accuracy_score
+# pred = model.predict(X_TEST)
+# print('accuracy score:', (accuracy_score(Y_TEST, pred)))
+
+# from xgboost import XGBClassifier
+# model = XGBClassifier(n_estimators=100, max_depth=5, eval_metric='error')
+# model.fit(X_TRAIN, Y_TRAIN)
+# from sklearn.metrics import accuracy_score
+# pred = model.predict(X_TEST)
+# print('accuracy score:', (accuracy_score(Y_TEST, pred)))
+
+from xgboost import XGBClassifier
+model = XGBClassifier(n_estimators=100, max_depth=5, eval_metric='error')
+model.fit(x_train, y_train)
+pred = model.predict(x_test)
+
+pred = pd.DataFrame(pred)
+print(pred)
+
+print(pd.concat([x_test_id, pred], axis=1).rename(columns={0:'income'}))
+result = pd.concat([x_test_id, pred], axis=1).rename(columns={0:'income'})
+result.to_csv('data/t2-3.csv', index=False)
