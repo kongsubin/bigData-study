@@ -4,8 +4,17 @@
 
 import pandas as pd
 data = pd.read_csv('bigData-main/basic1.csv')
-print(data.head())
 
 print(data.isnull().sum())
 data = data.drop(columns='f3')
-print(data.isnull().sum())
+
+print(data['city'].unique())
+s = data[data['city'] == '서울']['f1'].median()
+b = data[data['city'] == '부산']['f1'].median()
+d = data[data['city'] == '대구']['f1'].median()
+g = data[data['city'] == '경기']['f1'].median()
+
+
+data['f1'] = data['f1'].fillna(data['city'].map({'서울':s, '부산':b, '대구':d, '경기':g}))
+
+print(data['f1'].mean())
