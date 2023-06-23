@@ -7,6 +7,7 @@ from sklearn.datasets import load_iris
 # iris 데이터셋 로드
 iris = load_iris()
 df = pd.DataFrame(iris.data, columns=iris.feature_names)
+print(df)
 
 # Sepal Length와 Sepal Width의 상관계수 계산
 correlation = df.corr()
